@@ -9,15 +9,21 @@ metadata:
       icon: dashboard
       type: admin-dashboard
   annotations:    
-    argocd/app-name: ${{ values.name }}
-  {%- if values.isTekton %}
-    janus-idp.io/tekton: ${{ values.name }} 
-  {%- endif %}
-  {%- if values.isJenkins %}
-    jenkins.io/job-full-name: ${{ values.appName }} 
-  {%- endif %}
+    argocd/app-selector: rhtap/gitops=${{  values.name  }}
     backstage.io/kubernetes-id: ${{ values.name }} 
-    backstage.io/techdocs-ref: dir:. 
+    backstage.io/techdocs-ref: dir:.   
+  {%- if values.ciType == 'tekton' %} 
+    janus-idp.io/tekton: ${{ values.name }} 
+  {%- endif %} 
+  {%- if values.ciType == 'jenkins' %} 
+    jenkins.io/job-full-name: ${{ values.appName }} 
+  {%- endif %} 
+  {%- if values.ciType == 'githubactions' %} 
+    github.com/project-slug: ${{ values.gitRepoSlug }} 
+  {%- endif %} 
+  {%- if values.ciType == 'gitlabci' %} 
+    gitlab.com/project-slug: '${{ values.gitRepoSlug }}'
+  {%- endif %}   
 spec:
   type: gitops
   owner: ${{ values.owner }} 
